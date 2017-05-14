@@ -4,11 +4,9 @@
 @author: Paul Reiter
 """
 from functools import partial
-from itertools import product
-import subprocess
 import numpy as np
 from scipy.integrate import fixed_quad
-import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def complex_quad(function, a, b, n):
@@ -143,17 +141,7 @@ if __name__ == '__main__':
     def solution(x, y):
         return sum(p[0]*p[1](x, y) for p in zip(pw, phiw))
 
-    evaluation_grid = np.array(list(product(np.linspace(0, 2, 84),
-                                            np.linspace(0, 1, 44))))
-    grid_solution = np.array([solution(row[0], row[1])
-                              for row in evaluation_grid])
-
-    data = pd.DataFrame({'x': evaluation_grid[:, 0],
-                         'y': evaluation_grid[:, 1],
-                         'p_abs': np.abs(grid_solution),
-                         'p_real': grid_solution.real,
-                         'p_imag': grid_solution.imag})
-
-    data.to_csv('temp.csv', index=False)
-
-    subprocess.call("./pywbm.R")
+    x, y = np.meshgrid(np.linspace(0, 2, 84), np.linspace(0, 1, 44))
+    z = solution(x, y)
+    plt.contourf(x, y, z)
+    plt.show()
