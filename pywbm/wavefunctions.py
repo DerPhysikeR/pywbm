@@ -15,7 +15,7 @@ def line_integral(function, p0, p1, n):
     def to_quad(t):
         return function(x0 + t*(x1-x0), y0 + t*(y1-y0))
 
-    return fixed_quad(to_quad, 0, 1, n)[0]
+    return fixed_quad(to_quad, 0, 1, n=n)[0]
 
 
 class Wavefunctions():
