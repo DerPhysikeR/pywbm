@@ -34,9 +34,8 @@ class Subdomain():
 
     def solve(self, z, k, n, vn):
         if (z, k, n, vn) not in self.solutions:
-            wv = Wavefunctions(k, self.lx, self.ly)
-            a = self.a_ij(z, k, wv.phiw, wv.grad_phiw, n)
-            rhs = self.rhs_i(z, k, wv.phiw, vn, n)
+            a = self.a_ij(z, k, n)
+            rhs = self.rhs_i(z, k, vn, n)
         if (len(self.solutions) >= self.cache_length and
            (z, k, n, vn) not in self.solutions):
             self.solutions.popitem(last=False)
@@ -52,19 +51,21 @@ class Subdomain():
             return pw(x, y)*vn(x, y)
         return fv
 
-    def a_ij(self, z, k, phiw, grad_phiw, n):
-        a = np.zeros((len(phiw), len(phiw)), dtype=complex)
-        for i, pw in enumerate(phiw):
-            for j, gpw in enumerate(grad_phiw):
+    def a_ij(self, z, k, n):
+        wv = Wavefunctions(k, self.lx, self.ly)
+        a = np.zeros((len(wv.phiw), len(wv.phiw)), dtype=complex)
+        for i, pw in enumerate(wv.phiw):
+            for j, gpw in enumerate(wv.grad_phiw):
                 for normal, element in zip(self.normals, self.elements):
                     p0, p1 = self.nodes[element[0]], self.nodes[element[1]]
                     fun = partial(self.get_av(pw, gpw, z, k), normal)
                     a[i, j] += line_integral(fun, p0, p1, n)
         return a
 
-    def rhs_i(self, z, k, phiw, vn, n):
-        rhs = np.zeros(len(phiw), dtype=complex)
-        for i, pw in enumerate(phiw):
+    def rhs_i(self, z, k, vn, n):
+        wv = Wavefunctions(k, self.lx, self.ly)
+        rhs = np.zeros(len(wv.phiw), dtype=complex)
+        for i, pw in enumerate(wv.phiw):
             for normal, element in zip(self.normals, self.elements):
                 p0, p1 = self.nodes[element[0]], self.nodes[element[1]]
                 fun = partial(self.get_rhs(pw, vn), normal)
