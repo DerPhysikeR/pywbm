@@ -51,10 +51,10 @@ class Subdomain():
 
         if sources is not None:
             def source(x, y, k):
-                return sum([s[0](x, y) for s in sources])
+                return sum([s[0](x, y, k) for s in sources])
 
             def grad_source(n, x, y, k):
-                return sum([s[1](n[0], n[1], x, y) for s in sources])
+                return sum([s[1](n, x, y, k) for s in sources])
 
             self.pp = source
             self.gpp = grad_source
