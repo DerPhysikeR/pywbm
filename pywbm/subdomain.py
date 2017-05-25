@@ -131,9 +131,9 @@ class Subdomain():
                 for normal, element, kind, fun in zip(
                   self.normals, self.elements, self.kinds, self.functions):
                     p0, p1 = self.nodes[element[0]], self.nodes[element[1]]
-                    fun = partial(self.get_a(pwt, gpwt, pw, gpw, z, k, kind,
-                                             fun), normal)
-                    a[i, j] += line_integral(fun, p0, p1, n)
+                    function = partial(self.get_a(pwt, gpwt, pw, gpw, z, k,
+                                                  kind, fun), normal)
+                    a[i, j] += line_integral(function, p0, p1, n)
         return a
 
     def rhs_i(self, z, k, vn, n):
@@ -144,8 +144,9 @@ class Subdomain():
             for normal, element, kind, fun in zip(
               self.normals, self.elements, self.kinds, self.functions):
                 p0, p1 = self.nodes[element[0]], self.nodes[element[1]]
-                fun = partial(self.get_rhs(pwt, gpwt, z, k, kind, fun), normal)
-                rhs[i] += line_integral(fun, p0, p1, n)
+                function = partial(self.get_rhs(pwt, gpwt, z, k, kind, fun),
+                                   normal)
+                rhs[i] += line_integral(function, p0, p1, n)
         return rhs
 
     def field_solution(self, x, y, z, k, n, vn):
