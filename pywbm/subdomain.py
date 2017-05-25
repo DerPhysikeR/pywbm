@@ -3,11 +3,10 @@
 2017-05-14 18:35:02
 @author: Paul Reiter
 """
-from abc import ABCMeta
 import numpy as np
 
 
-class Subdomain(metaclass=ABCMeta):
+class Subdomain():
 
     def __init__(self, nodes, elements, bounded=True):
         if max([max(ele) for ele in elements]) > len(nodes)-1:
