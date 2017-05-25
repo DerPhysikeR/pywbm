@@ -39,12 +39,12 @@ class Subdomain():
         self.solutions[(z, k, n, vn)] = np.linalg.solve(a, rhs)
 
     def get_av(self, pw, gpw, z, k):
-        def av(nx, ny, x, y):
-            return 1j/(z*k)*pw(x, y)*gpw(nx, ny, x, y)
+        def av(normal, x, y):
+            return 1j/(z*k)*pw(x, y)*gpw(normal[0], normal[1], x, y)
         return av
 
     def get_rhs(self, pw, vn):
-        def fv(nx, ny, x, y):
+        def fv(normal, x, y):
             return pw(x, y)*vn(x, y)
         return fv
 
@@ -54,8 +54,7 @@ class Subdomain():
             for j, gpw in enumerate(grad_phiw):
                 for normal, element in zip(self.normals, self.elements):
                     p0, p1 = self.nodes[element[0]], self.nodes[element[1]]
-                    fun = partial(self.get_av(pw, gpw, z, k),
-                                  normal[0], normal[1])
+                    fun = partial(self.get_av(pw, gpw, z, k), normal)
                     a[i, j] += line_integral(fun, p0, p1, n)
         return a
 
@@ -64,7 +63,7 @@ class Subdomain():
         for i, pw in enumerate(phiw):
             for normal, element in zip(self.normals, self.elements):
                 p0, p1 = self.nodes[element[0]], self.nodes[element[1]]
-                fun = partial(self.get_rhs(pw, vn), normal[0], normal[1])
+                fun = partial(self.get_rhs(pw, vn), normal)
                 rhs[i] += line_integral(fun, p0, p1, n)
         return rhs
 
