@@ -10,6 +10,8 @@ import numpy as np
 class Subdomain(metaclass=ABCMeta):
 
     def __init__(self, nodes, elements, bounded=True):
+        if max([max(ele) for ele in elements]) > len(nodes)-1:
+            raise ValueError('Element references non-existing node!')
         self.bounded = bounded
         self.nodes = np.array(nodes)
         self.elements = np.array(elements)
