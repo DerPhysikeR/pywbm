@@ -28,7 +28,8 @@ class Subdomain():
         functions : list
             List of functions f(x, y) for the quantities given by `kinds`
         sources : list
-            List of source functions p(x, y) inside domain
+            List of source function tuples [(p1, grap1), (p2, gradp2), ...]
+            p1(k, x, y), p2(k, (nx, ny), x, y) 
         bounded : boolean
             Optional, marks boundary as bounded as opposed to open
             Default is True, which means bounded.
@@ -47,7 +48,19 @@ class Subdomain():
         self.ly = np.max(self.nodes[:, 1]) - np.min(self.nodes[:, 1])
         self.solutions = OrderedDict()
         self.cache_length = cache_length
-        self.sources = sources
+
+        if sources is not None:
+            def source(x, y, k):
+                return sum([s[0](x, y) for s in sources])
+
+            def grad_source(n, x, y, k):
+                return sum([s[1](n[0], n[1], x, y) for s in sources])
+
+            self.pp = source
+            self.gpp = grad_source
+        else:
+            self.pp = lambda x, y, k: 0
+            self.gpp = lambda n, x, y, k: 0
 
     @property
     def normals(self):
@@ -91,16 +104,19 @@ class Subdomain():
     def get_rhs(self, pwt, gpwt, z, k, kind, fun):
         if kind == 'v':
             def ffun(n, x, y):
-                return pwt(x, y)*fun(x, y)
+                return pwt(x, y)*(fun(x, y) - 1j/(z*k)*self.gpp(n, x, y, k))
         elif kind == 'z':
             def ffun(n, x, y):
-                return 0
+                return pwt(x, y)*(self.pp(x, y, k)/fun(x, y) -
+                                  1j/(z*k)*self.gpp(n, x, y, k))
         elif kind == 'p':
             def ffun(n, x, y):
-                return 0
+                return 1j/(z*k)*gpwt(n[0], n[1], x, y)(self.pp(x, y, k) -
+                                                       fun(x, y))
         elif kind == 'i':
             def ffun(n, x, y):
-                return 0
+                return pwt(x, y)*(self.pp(x, y, k)/fun(x, y) -
+                                  1j/(z*k)*self.gpp(n, x, y, k))
         else:
             raise ValueError('Only kinds v, z, p and i are allowed for'
                              ' element!')
