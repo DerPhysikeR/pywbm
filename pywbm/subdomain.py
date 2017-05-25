@@ -156,4 +156,6 @@ class Subdomain():
 
         pw = self.solutions[(z, k, n, vn)]
         wv = Wavefunctions(k, self.lx, self.ly)
-        return sum(p[0]*p[1](x, y) for p in zip(pw, wv.phiw))
+        homogeneous = sum(p[0]*p[1](x, y) for p in zip(pw, wv.phiw))
+        particular = self.pp(x, y, k)
+        return homogeneous + particular
