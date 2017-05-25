@@ -111,8 +111,8 @@ class Subdomain():
                                   1j/(z*k)*self.gpp(n, x, y, k))
         elif kind == 'p':
             def ffun(n, x, y):
-                return 1j/(z*k)*gpwt(n[0], n[1], x, y)(self.pp(x, y, k) -
                                                        fun(x, y))
+                return 1j/(z*k)*gpwt(n[0], n[1], x, y)*(self.pp(x, y, k) -
         elif kind == 'i':
             def ffun(n, x, y):
                 return pwt(x, y)*(self.pp(x, y, k)/fun(x, y) -
