@@ -8,7 +8,9 @@ import numpy as np
 from scipy.integrate import fixed_quad
 
 
-def line_integral(function, x0, y0, x1, y1, n):
+def line_integral(function, p0, p1, n):
+    x0, y0 = p0[0], p0[1]
+    x1, y1 = p1[0], p1[1]
 
     def to_quad(t):
         return function(x0 + t*(x1-x0), y0 + t*(y1-y0))
