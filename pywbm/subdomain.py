@@ -11,7 +11,7 @@ from .wavefunctions import Wavefunctions, line_integral
 
 class Subdomain():
 
-    def __init__(self, nodes, elements, bounded=True):
+    def __init__(self, nodes, elements, bounded=True, cache_length=np.inf):
         if max([max(ele) for ele in elements]) > len(nodes)-1:
             raise ValueError('Element references non-existing node!')
         self.bounded = bounded
@@ -20,6 +20,7 @@ class Subdomain():
         self.lx = np.max(self.nodes[:, 0]) - np.min(self.nodes[:, 0])
         self.ly = np.max(self.nodes[:, 1]) - np.min(self.nodes[:, 1])
         self.solutions = OrderedDict()
+        self.cache_length = cache_length
 
     @property
     def normals(self):
@@ -36,6 +37,9 @@ class Subdomain():
             wv = Wavefunctions(k, self.lx, self.ly)
             a = self.a_ij(z, k, wv.phiw, wv.grad_phiw, n)
             rhs = self.rhs_i(z, k, wv.phiw, vn, n)
+        if (len(self.solutions) >= self.cache_length and
+           (z, k, n, vn) not in self.solutions):
+            self.solutions.popitem(last=False)
         self.solutions[(z, k, n, vn)] = np.linalg.solve(a, rhs)
 
     def get_av(self, pw, gpw, z, k):
