@@ -7,13 +7,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pywbm import Subdomain
 
-z = 1.205*343.4
-k = 2*np.pi*800/343.4
-lx, ly, n = 2, 1, 100
-nodes = [(0, 0), (lx, 0), (lx, ly), (0, ly)]
-elements = [(0, 1), (1, 2), (2, 3), (3, 0)]
-sd = Subdomain(nodes, elements)
-
 
 def vn(x, y):
     # incident velocity on left side
@@ -32,9 +25,20 @@ def vn(x, y):
     # return np.logical_or((x == 0), (y == 0)).astype(complex)*1j/(k*z)
 
 
-sd.solve(z, k, n, vn)
+if __name__ == '__main__':
 
-x, y = np.meshgrid(np.linspace(0, lx, 84), np.linspace(0, ly, 44))
-z = sd.field_solution(x, y, z, k, n, vn)
-plt.contourf(x, y, z)
-plt.show()
+    z = 1.205*343.4
+    k = 2*np.pi*800/343.4
+    lx, ly, n = 2, 1, 100
+    nodes = [(0, 0), (lx, 0), (lx, ly), (0, ly)]
+    elements = [(0, 1), (1, 2), (2, 3), (3, 0)]
+    kinds = ['v']*4
+    functions = [vn]*4
+    sd = Subdomain(nodes, elements, kinds, functions)
+
+    sd.solve(z, k, n, vn)
+
+    x, y = np.meshgrid(np.linspace(0, lx, 84), np.linspace(0, ly, 44))
+    z = sd.field_solution(x, y, z, k, n, vn)
+    plt.contourf(x, y, z)
+    plt.show()
