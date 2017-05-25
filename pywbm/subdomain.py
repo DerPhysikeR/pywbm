@@ -13,12 +13,11 @@ class Subdomain(metaclass=ABCMeta):
         self.bounded = bounded
         self.nodes = np.array(nodes)
         self.elements = np.array(elements)
-        print(nodes)
         self.lx = np.max(self.nodes[:, 0]) - np.min(self.nodes[:, 0])
         self.ly = np.max(self.nodes[:, 1]) - np.min(self.nodes[:, 1])
-        self.normals = self._get_normals()
 
-    def _get_normals(self):
+    @property
+    def normals(self):
         normals = np.empty_like(self.elements)
         for i, element in enumerate(self.elements):
             p0, p1 = self.nodes[element[0]], self.nodes[element[1]]
