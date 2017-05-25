@@ -26,7 +26,7 @@ class Subdomain():
             Marking velocity, impedance, pressure and interface boundary
             conditions.
         functions : list
-            List of functions f(x, y) for the quantities given by `kinds`
+            List of functions f(x, y, z, k) for the quantities given by `kinds`
         sources : list
             List of source function tuples [(p1, grap1), (p2, gradp2), ...]
             p1(k, x, y), p2(k, (nx, ny), x, y) 
@@ -88,14 +88,14 @@ class Subdomain():
         elif kind == 'z':
             def afun(n, x, y):
                 return (1j/(z*k)*pwt(x, y)*gpw(n[0], n[1], x, y) -
-                        1/fun(x, y)*pwt(x, y)*pw(x, y))
+                        1/fun(x, y, z, k)*pwt(x, y)*pw(x, y))
         elif kind == 'p':
             def afun(n, x, y):
                 return -1j/(z*k)*gpwt(n[0], n[1], x, y)*pw(x, y)
         elif kind == 'i':
             def afun(n, x, y):
                 return (1j/(z*k)*pwt(x, y)*gpw(n[0], n[1], x, y) -
-                        1/fun(x, y)*pwt(x, y)*pw(x, y))
+                        1/fun(x, y, z, k)*pwt(x, y)*pw(x, y))
         else:
             raise ValueError('Only kinds v, z, p and i are allowed for'
                              ' element!')
@@ -104,18 +104,19 @@ class Subdomain():
     def get_rhs(self, pwt, gpwt, z, k, kind, fun):
         if kind == 'v':
             def ffun(n, x, y):
-                return pwt(x, y)*(fun(x, y) - 1j/(z*k)*self.gpp(n, x, y, k))
+                return pwt(x, y)*(fun(x, y, z, k) -
+                                  1j/(z*k)*self.gpp(n, x, y, k))
         elif kind == 'z':
             def ffun(n, x, y):
-                return pwt(x, y)*(self.pp(x, y, k)/fun(x, y) -
+                return pwt(x, y)*(self.pp(x, y, k)/fun(x, y, z, k) -
                                   1j/(z*k)*self.gpp(n, x, y, k))
         elif kind == 'p':
             def ffun(n, x, y):
-                                                       fun(x, y))
                 return 1j/(z*k)*gpwt(n[0], n[1], x, y)*(self.pp(x, y, k) -
+                                                        fun(x, y, z, k))
         elif kind == 'i':
             def ffun(n, x, y):
-                return pwt(x, y)*(self.pp(x, y, k)/fun(x, y) -
+                return pwt(x, y)*(self.pp(x, y, k)/fun(x, y, z, k) -
                                   1j/(z*k)*self.gpp(n, x, y, k))
         else:
             raise ValueError('Only kinds v, z, p and i are allowed for'
