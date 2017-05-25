@@ -29,7 +29,7 @@ class Subdomain():
             List of functions f(x, y, z, k) for the quantities given by `kinds`
         sources : list
             List of source function tuples [(p1, grap1), (p2, gradp2), ...]
-            p1(k, x, y), p2(k, (nx, ny), x, y) 
+            p1(k, x, y), p2(k, (nx, ny), x, y)
         bounded : boolean
             Optional, marks boundary as bounded as opposed to open
             Default is True, which means bounded.
