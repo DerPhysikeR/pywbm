@@ -72,14 +72,14 @@ class Subdomain():
             normals[i, 1] = (p1[0]-p0[0]) / length
         return normals
 
-    def solve(self, z, k, n, vn):
-        if (z, k, n, vn) not in self.solutions:
+    def solve(self, z, k, n):
+        if (z, k, n) not in self.solutions:
             a = self.a_ij(z, k, n)
-            rhs = self.rhs_i(z, k, vn, n)
+            rhs = self.rhs_i(z, k, n)
         if (len(self.solutions) >= self.cache_length and
-           (z, k, n, vn) not in self.solutions):
+           (z, k, n) not in self.solutions):
             self.solutions.popitem(last=False)
-        self.solutions[(z, k, n, vn)] = np.linalg.solve(a, rhs)
+        self.solutions[(z, k, n)] = np.linalg.solve(a, rhs)
 
     def get_a(self, pwt, gpwt, pw, gpw, z, k, kind, fun):
         if kind == 'v':
@@ -137,7 +137,7 @@ class Subdomain():
                     a[i, j] += line_integral(function, p0, p1, n)
         return a
 
-    def rhs_i(self, z, k, vn, n):
+    def rhs_i(self, z, k, n):
         wv = Wavefunctions(k, self.lx, self.ly)
         rhs = np.zeros(len(wv.phiw), dtype=complex)
         # pwt ... t is for transposed
@@ -150,12 +150,12 @@ class Subdomain():
                 rhs[i] += line_integral(function, p0, p1, n)
         return rhs
 
-    def field_solution(self, x, y, z, k, n, vn):
-        if (z, k, n, vn) not in self.solutions:
-            self.solve(z, k, n, vn)
+    def field_solution(self, x, y, z, k, n):
+        if (z, k, n) not in self.solutions:
+            self.solve(z, k, n)
 
-        pw = self.solutions[(z, k, n, vn)]
+        pw = self.solutions[(z, k, n)]
         wv = Wavefunctions(k, self.lx, self.ly)
         homogeneous = sum(p[0]*p[1](x, y) for p in zip(pw, wv.phiw))
-        particular = self.pp(x, y, k)
-        return homogeneous + particular
+        # particular = self.pp(x, y, k)
+        return homogeneous #+ particular
