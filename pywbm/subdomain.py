@@ -6,6 +6,8 @@
 from collections import OrderedDict
 from functools import partial
 import numpy as np
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 from .wavefunctions import Wavefunctions, line_integral
 
 
@@ -156,5 +158,9 @@ class Subdomain():
         pw = self.solutions[(z, k, n)]
         wv = Wavefunctions(k, self.lx, self.ly)
         homogeneous = sum(p[0]*p[1](x, y) for p in zip(pw, wv.phiw))
-        # particular = self.pp(x, y, k)
-        return homogeneous #+ particular
+        particular = self.pp(x, y, k)
+        return homogeneous + particular
+
+    def point_inside(self, x, y):
+        polygon = Polygon(self.nodes)
+        return polygon.intersects(Point(x, y))

@@ -110,3 +110,14 @@ def test_impedance_bc(frequency):
 
     assert_allclose(np.array(reference_solution),
                     np.array(solution))
+
+
+@pytest.mark.parametrize('x, y, inside', [
+    (.5, .5, True),
+    (1, 1, True),
+    (2, 2, False)
+])
+def test_point_inside(x, y, inside):
+    sd = Subdomain([(0, 0), (0, 1), (1, 1), (1, 0)],
+                   [(0, 1), (1, 2), (2, 3), (3, 0)], None, None)
+    assert sd.point_inside(x, y) == inside
