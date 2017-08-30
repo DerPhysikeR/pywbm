@@ -76,10 +76,9 @@ class Subdomain():
         if (z, k, n) not in self.solutions:
             a = self.a_ij(z, k, n)
             rhs = self.rhs_i(z, k, n)
-        if (len(self.solutions) >= self.cache_length and
-           (z, k, n) not in self.solutions):
-            self.solutions.popitem(last=False)
-        self.solutions[(z, k, n)] = np.linalg.solve(a, rhs)
+            if len(self.solutions) >= self.cache_length:
+                self.solutions.popitem(last=False)
+            self.solutions[(z, k, n)] = np.linalg.solve(a, rhs)
 
     def get_a(self, pwt, gpwt, pw, gpw, z, k, kind, fun):
         if kind == 'v':
